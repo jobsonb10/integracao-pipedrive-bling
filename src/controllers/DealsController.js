@@ -1,17 +1,27 @@
-const Deal = require('../models/Deal');
+const axios = require('axios');
 
-const getAll = async (req, res) => {
+const getAllDeals = async (req, res) => {
     try{
-        const deals = await Deal.find();
-        if (deals.length === 0) {
-            return res.send({ error: "Nenhuma negociação feita!"});
-        }
-        return res.send({ deals });
+        const deals = await axios.get(`https://companydomain.pipedrive.com/api/v1/deals?api_token=${process.env.PIPE_TOKEN}`);
+        return res.json(deals.data);
     } catch(err){
         res.status(500).send({ error: err });
     }
 };
 
+const getWonDeals = async (req, res) => {
+    try{
+        const wonDeals = await axios.get(`https://api.pipedrive.com/v1/deals?status=won&start=0&api_token=${process.env.PIPE_TOKEN}`);
+        const { data } = wonDeals.data;
+        res.json(data);
+    } catch(err){
+        return res.status(500).send({ error: err });
+    }
+
+
+}
+
 module.exports = {
-    getAll
+    getAllDeals,
+    getWonDeals,
 }
